@@ -25,13 +25,14 @@ jobs:
       - name: Build Next.js static export
         run: npm run build
 
-      - name: Sync Capacitor iOS
-        run: npx cap sync ios
-
       - name: Install CocoaPods
-        run: |
-          gem install cocoapods
-          cd ios/App && pod install
+        run: sudo gem install cocoapods
+
+      - name: Copy web assets to iOS
+        run: npx cap copy ios
+
+      - name: Pod install
+        run: cd ios/App && pod install
 
       - name: Import signing certificate
         run: |
