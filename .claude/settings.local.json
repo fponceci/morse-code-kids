@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@14 . --typescript --tailwind --app --src-dir --no-eslint --import-alias \"@/*\" --yes)",
+      "Bash(npx create-next-app@14 . --typescript --tailwind --app --src-dir --no-eslint --import-alias \"@/*\" 2)",
+      "Bash(1:*)",
+      "Read(//d/03 - Francisco/Source/**)",
+      "Bash(npx create-next-app@14 morse-temp --typescript --tailwind --app --src-dir --no-eslint --import-alias \"@/*\" --yes)",
+      "Bash(cp -r \"D:/03 - Francisco/Source/morse-temp/.\" \"D:/03 - Francisco/Source/MorseCodeKids/\")",
+      "Bash(rm -rf \"D:/03 - Francisco/Source/morse-temp\")",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(npx cap:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(where npm:*)",
+      "Read(//c/Program Files/Android/**)",
+      "Read(//c/Program Files/Android//**)",
+      "Bash(reg query:*)",
+      "Bash(find '/c/Program Files' -name studio*.exe)",
+      "Bash(echo \"ANDROID_HOME: $ANDROID_HOME\")",
+      "Bash(echo \"ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT\")",
+      "Read(//c/Users/fponce/AppData/Local/**)",
+      "Bash(keytool -genkeypair -v -keystore morse-kids-release.jks -alias morse-kids -keyalg RSA -keysize 2048 -validity 10000 -dname \"CN=MorseCodeKids, OU=App, O=MorseKids, L=Unknown, S=Unknown, C=US\" -storepass morsekids2024 -keypass morsekids2024)",
+      "Bash(\"/c/Program Files/Android/openjdk/jdk-21.0.8/bin/keytool.exe\" -genkeypair -v -keystore morse-kids-release.jks -alias morse-kids -keyalg RSA -keysize 2048 -validity 10000 -dname \"CN=MorseCodeKids, OU=App, O=MorseKids, L=Unknown, S=Unknown, C=US\" -storepass morsekids2024 -keypass morsekids2024)",
+      "Bash(base64 -w)"
+    ]
+  }
+}

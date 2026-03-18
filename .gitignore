@@ -34,3 +34,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Capacitor
+ios/App/Pods/
+android/app/build/
+android/.gradle/
+android/build/
+
+# Signing keys — NEVER commit these to git
+*.jks
+*.p12
+*.mobileprovision
+*.b64

@@ -1,101 +1,129 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { DotMascot } from '@/components/mascot/DotMascot';
+import { DashMascot } from '@/components/mascot/DashMascot';
+import { Card } from '@/components/ui/Card';
+import { MORSE_CODE_MAP } from '@/lib/morse';
+
+const navCards = [
+  {
+    href: '/translator',
+    emoji: '🔤',
+    title: 'Translator',
+    desc: 'Turn words into Morse code!',
+    color: 'bg-morse-purple',
+    shadow: 'shadow-[0_6px_0_#5B21B6]',
+  },
+  {
+    href: '/listen',
+    emoji: '👂',
+    title: 'Listen Mode',
+    desc: 'Hear Morse & guess the letter!',
+    color: 'bg-morse-teal',
+    shadow: 'shadow-[0_6px_0_#0F766E]',
+  },
+  {
+    href: '/games',
+    emoji: '🎮',
+    title: 'Games',
+    desc: 'Play 4 fun Morse code games!',
+    color: 'bg-morse-coral',
+    shadow: 'shadow-[0_6px_0_#E11D48]',
+  },
+  {
+    href: '/alphabet',
+    emoji: '📖',
+    title: 'Alphabet',
+    desc: 'Learn all the Morse letters!',
+    color: 'bg-morse-yellow',
+    shadow: 'shadow-[0_6px_0_#D97706]',
+  },
+];
+
+export default function HomePage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex flex-col min-h-screen">
+      {/* Hero */}
+      <div className="bg-gradient-to-b from-morse-purple to-morse-purple/80 px-6 pt-10 pb-8 text-white text-center">
+        <div className="flex justify-center items-end gap-6 mb-4">
+          <DotMascot size={70} />
+          <motion.h1
+            className="text-4xl font-black leading-tight"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            Morse<br />Code<br />Kids!
+          </motion.h1>
+          <DashMascot size={50} />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        <motion.p
+          className="text-white/70 text-base font-semibold"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          Learn the secret language of dots &amp; dashes!
+        </motion.p>
+
+        {/* Morse ticker */}
+        <div className="mt-4 overflow-hidden">
+          <motion.div
+            className="flex gap-8 whitespace-nowrap text-morse-yellow font-black text-xl"
+            animate={{ x: ['100%', '-200%'] }}
+            transition={{ duration: 14, repeat: Infinity, ease: 'linear' }}
+          >
+            <span>... --- ...</span>
+            <span>-- --- .-. ... .</span>
+            <span>.... ..</span>
+            <span>.- -... -.-.</span>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* What is Morse? */}
+      <div className="px-4 py-5">
+        <Card color="purple" className="mb-4">
+          <h2 className="font-black text-morse-purple text-lg mb-2">🤔 What is Morse Code?</h2>
+          <p className="text-morse-navy/70 font-semibold text-sm leading-relaxed">
+            Morse code turns letters into short <strong>dots (·)</strong> and long <strong>dashes (—)</strong>.
+            You can tap it, beep it, or flash it with a light!
+          </p>
+          <div className="flex gap-6 mt-3 text-center">
+            {['A', 'S', 'O'].map((letter) => (
+              <div key={letter} className="flex flex-col items-center gap-1">
+                <span className="font-black text-2xl text-morse-purple">{letter}</span>
+                <span className="font-mono text-sm text-morse-navy/60">{MORSE_CODE_MAP[letter]}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Nav cards */}
+        <h2 className="font-black text-morse-navy text-xl mb-3">Let&apos;s get started! 🚀</h2>
+        <div className="grid grid-cols-2 gap-3">
+          {navCards.map(({ href, emoji, title, desc, color, shadow }, i) => (
+            <motion.div
+              key={href}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * i + 0.3 }}
+            >
+              <Link href={href}>
+                <div
+                  className={`${color} ${shadow} text-white rounded-3xl p-4 h-full transition-all active:translate-y-[6px] active:shadow-none no-select`}
+                >
+                  <div className="text-4xl mb-2">{emoji}</div>
+                  <div className="font-black text-base">{title}</div>
+                  <div className="text-white/70 text-xs font-semibold mt-1">{desc}</div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
