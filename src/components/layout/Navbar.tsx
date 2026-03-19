@@ -7,18 +7,27 @@ import { motion } from 'framer-motion';
 interface NavbarProps {
   title?: string;
   showBack?: boolean;
+  darkMode?: boolean;
 }
 
-export function Navbar({ title, showBack = false }: NavbarProps) {
+export function Navbar({ title, showBack = false, darkMode = false }: NavbarProps) {
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 z-40 bg-morse-cream/90 backdrop-blur-sm border-b-2 border-morse-purple/10">
+    <header className={`sticky top-0 z-40 backdrop-blur-sm border-b-2 ${
+      darkMode
+        ? 'bg-morse-navy/95 border-white/10'
+        : 'bg-morse-cream/90 border-morse-purple/10'
+    }`}>
       <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
         {showBack ? (
           <button
             onClick={() => router.back()}
-            className="w-9 h-9 rounded-2xl bg-morse-purple/10 flex items-center justify-center font-bold text-morse-purple text-lg"
+            className={`w-9 h-9 rounded-2xl flex items-center justify-center font-bold text-lg ${
+              darkMode
+                ? 'bg-white/10 text-white'
+                : 'bg-morse-purple/10 text-morse-purple'
+            }`}
           >
             ←
           </button>
@@ -28,7 +37,9 @@ export function Navbar({ title, showBack = false }: NavbarProps) {
           </Link>
         )}
         {title && (
-          <h1 className="font-black text-morse-navy text-lg flex-1 text-center">
+          <h1 className={`font-black text-lg flex-1 text-center ${
+            darkMode ? 'text-white' : 'text-morse-navy'
+          }`}>
             {title}
           </h1>
         )}
