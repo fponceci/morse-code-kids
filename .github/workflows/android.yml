@@ -34,8 +34,8 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
-      - name: Copy web assets to Android
-        run: npx cap copy android
+      - name: Sync Capacitor (web assets + generate native plugin files)
+        run: npx cap sync android
 
       - name: Decode keystore
         run: |
