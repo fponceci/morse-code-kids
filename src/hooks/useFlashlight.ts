@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { MorseCharacter, SpeedPreset } from '@/types';
 import { SPEED_WPM } from '@/types';
+import { MorseAudioEngine } from '@/lib/audio';
 
 interface UseFlashlightReturn {
   isAvailable: boolean;
   isNative: boolean;
   isFlashing: boolean;
-  flashMorse: (chars: MorseCharacter[], speed: SpeedPreset) => Promise<void>;
+  isOn: boolean; // true while a symbol is actively flashing (for UI sync)
+  flashMorse: (chars: MorseCharacter[], speed: SpeedPreset, withAudio?: boolean) => Promise<void>;
   stop: () => void;
 }
 
@@ -23,12 +25,18 @@ export function useFlashlight(): UseFlashlightReturn {
   const [isAvailable, setIsAvailable] = useState(false);
   const [isNative, setIsNative]       = useState(false);
   const [isFlashing, setIsFlashing]   = useState(false);
+  const [isOn, setIsOn]               = useState(false);
 
-  // Web-only: camera stream reference
-  const streamRef  = useRef<MediaStream | null>(null);
-  const abortRef   = useRef<AbortController | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const abortRef  = useRef<AbortController | null>(null);
+  const audioRef  = useRef<MorseAudioEngine | null>(null);
 
-  // Check availability on mount
+  // Init audio engine
+  useEffect(() => {
+    audioRef.current = new MorseAudioEngine();
+  }, []);
+
+  // Check torch availability on mount
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -39,9 +47,7 @@ export function useFlashlight(): UseFlashlightReturn {
           setIsAvailable(available);
           setIsNative(isNativePlatform());
         }
-      } catch {
-        // Plugin not available in this environment
-      }
+      } catch { /* plugin not available */ }
     })();
     return () => { cancelled = true; };
   }, []);
@@ -60,34 +66,37 @@ export function useFlashlight(): UseFlashlightReturn {
     }
   }, []);
 
-  /** Toggle torch on/off using the plugin */
+  /** Toggle torch on/off */
   const setTorch = useCallback(async (on: boolean) => {
+    setIsOn(on);
     try {
       const { Torch } = await import('@capawesome/capacitor-torch');
       if (isNativePlatform()) {
-        // Native Android / iOS — no stream needed
         on ? await Torch.enable() : await Torch.disable();
       } else {
-        // Web (Chrome on Android) — needs MediaStream
         const stream = await getStream();
         if (!stream) return;
-        on
-          ? await Torch.enable({ stream })
-          : await Torch.disable({ stream });
+        on ? await Torch.enable({ stream }) : await Torch.disable({ stream });
       }
-    } catch { /* silently ignore mid-flash errors */ }
+    } catch { /* silently ignore */ }
   }, [getStream]);
 
-  /** Flash a MorseCharacter sequence using the torch */
+  /** Flash a MorseCharacter sequence — optionally with synced audio */
   const flashMorse = useCallback(async (
     chars: MorseCharacter[],
     speed: SpeedPreset,
+    withAudio = false,
   ) => {
     abortRef.current?.abort();
     const abort = new AbortController();
     abortRef.current = abort;
 
-    const dotMs = 1200 / SPEED_WPM[speed];
+    const dot = 1200 / SPEED_WPM[speed];
+
+    // Resume audio context inside the user-gesture call stack
+    if (withAudio && audioRef.current) {
+      await audioRef.current.resume();
+    }
 
     const sleep = (ms: number) =>
       new Promise<void>((resolve, reject) => {
@@ -103,40 +112,42 @@ export function useFlashlight(): UseFlashlightReturn {
       for (const char of chars) {
         if (abort.signal.aborted) break;
 
-        // Word gap (space character)
         if (char.original === ' ') {
-          await sleep(dotMs * 7);
+          await sleep(dot * 7);
           continue;
         }
 
         for (let si = 0; si < char.symbols.length; si++) {
           if (abort.signal.aborted) break;
-          const sym = char.symbols[si];
+          const dur = char.symbols[si] === '.' ? dot : dot * 3;
 
+          // Fire audio immediately (non-blocking) and turn torch on — perfectly synced
+          if (withAudio && audioRef.current) {
+            audioRef.current.beepMs(dur).catch(() => {});
+          }
           await setTorch(true);
-          await sleep(sym === '.' ? dotMs : dotMs * 3); // dit or dah
+          await sleep(dur);
           await setTorch(false);
 
-          // Inter-symbol gap (skip after last symbol of a character)
-          if (si < char.symbols.length - 1) await sleep(dotMs);
+          // Inter-symbol gap
+          if (si < char.symbols.length - 1) await sleep(dot);
         }
 
-        // Inter-letter gap (3 dots − the 1 already waited)
-        await sleep(dotMs * 2);
+        // Inter-letter gap (3 dots − 1 already waited)
+        await sleep(dot * 2);
       }
-    } catch {
-      // AbortError — clean stop requested
-    }
+    } catch { /* AbortError — clean stop */ }
 
     await setTorch(false);
     setIsFlashing(false);
   }, [setTorch]);
 
-  /** Stop mid-flash */
   const stop = useCallback(() => {
     abortRef.current?.abort();
     setIsFlashing(false);
+    setIsOn(false);
     setTorch(false);
+    audioRef.current?.stop();
   }, [setTorch]);
 
   // Cleanup on unmount
@@ -145,8 +156,9 @@ export function useFlashlight(): UseFlashlightReturn {
       abortRef.current?.abort();
       streamRef.current?.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
+      audioRef.current?.stop();
     };
   }, []);
 
-  return { isAvailable, isNative, isFlashing, flashMorse, stop };
+  return { isAvailable, isNative, isFlashing, isOn, flashMorse, stop };
 }

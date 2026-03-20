@@ -22,16 +22,18 @@ const SPEED_OPTIONS: { preset: SpeedPreset; label: string; emoji: string; desc: 
   { preset: 'fast',   label: 'Fast',   emoji: '🚀', desc: '25 WPM' },
 ];
 
-/** Visual screen-flash effect so desktop users can see it working */
-function ScreenFlash({ active }: { active: boolean }) {
+/** Screen flash — synced to actual morse timing via isOn, only on devices without real torch */
+function ScreenFlash({ isOn }: { isOn: boolean }) {
   return (
     <AnimatePresence>
-      {active && (
+      {isOn && (
         <motion.div
+          key="flash"
           className="fixed inset-0 bg-white z-50 pointer-events-none"
           initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0.8, 0] }}
-          transition={{ repeat: Infinity, duration: 0.3 }}
+          animate={{ opacity: 0.85 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.03 }}
         />
       )}
     </AnimatePresence>
@@ -41,7 +43,8 @@ function ScreenFlash({ active }: { active: boolean }) {
 export default function FlashPage() {
   const [text, setText] = useState('SOS');
   const [speed, setSpeed] = useState<SpeedPreset>('slow');
-  const { isAvailable, isNative, isFlashing, flashMorse, stop } = useFlashlight();
+  const [soundOn, setSoundOn] = useState(true);
+  const { isAvailable, isNative, isFlashing, isOn, flashMorse, stop } = useFlashlight();
 
   // Compute current morse preview
   const morsePreview = parseMorseString(text)
@@ -53,7 +56,7 @@ export default function FlashPage() {
     if (!text.trim()) return;
     const chars = parseMorseString(text);
     if (!chars.length) return;
-    await flashMorse(chars, speed);
+    await flashMorse(chars, speed, soundOn);
   }, [isFlashing, text, speed, flashMorse, stop]);
 
   const handleQuickSelect = (msg: string) => {
@@ -63,8 +66,8 @@ export default function FlashPage() {
 
   return (
     <>
-      {/* Screen flash effect — only on devices with no real torch (desktop preview) */}
-      <ScreenFlash active={isFlashing && !isAvailable} />
+      {/* Screen flash — synced to morse timing, only when no real torch available */}
+      <ScreenFlash isOn={isOn && !isAvailable} />
 
       <div className="flex flex-col min-h-screen bg-morse-navy">
         <Navbar title="🔦 Flashlight Signal" showBack darkMode />
@@ -74,24 +77,42 @@ export default function FlashPage() {
           {/* Hero torch display */}
           <div className="text-center py-6">
             <motion.div
-              animate={isFlashing ? {
-                scale: [1, 1.15, 1],
-                filter: ['brightness(1)', 'brightness(2)', 'brightness(1)'],
-              } : { scale: 1 }}
-              transition={{ repeat: isFlashing ? Infinity : 0, duration: 0.4 }}
+              animate={isOn
+                ? { scale: 1.2, filter: 'brightness(2.5) drop-shadow(0 0 20px #FFD700)' }
+                : { scale: 1,   filter: 'brightness(1)' }
+              }
+              transition={{ duration: 0.04 }}
               className="text-8xl mb-2 select-none"
             >
               🔦
             </motion.div>
             <p className="text-white/50 text-xs font-bold uppercase tracking-widest">
               {isFlashing
-              ? '⚡ Flashing...'
+              ? isOn ? '⚡ ON' : '· · ·'
               : isNative
                 ? '📱 Native Torch Ready'
                 : isAvailable
                   ? '✅ Camera Torch Ready'
                   : '💻 Screen Mode Only'}
             </p>
+          </div>
+
+          {/* Sound toggle */}
+          <div className="flex items-center justify-between bg-white/10 rounded-2xl px-4 py-3">
+            <div>
+              <p className="text-white text-sm font-bold">Sound</p>
+              <p className="text-white/40 text-xs">Play Morse beeps while flashing</p>
+            </div>
+            <button
+              onClick={() => setSoundOn((v) => !v)}
+              className={`w-14 h-7 rounded-full transition-colors relative ${soundOn ? 'bg-morse-yellow' : 'bg-white/20'}`}
+            >
+              <motion.div
+                animate={{ x: soundOn ? 28 : 4 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                className="absolute top-1 w-5 h-5 rounded-full bg-white shadow"
+              />
+            </button>
           </div>
 
           {/* Device support badge */}
