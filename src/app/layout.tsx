@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { BottomNav } from '@/components/layout/BottomNav';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: 'Morse Code Kids',
@@ -19,6 +20,7 @@ export default function RootLayout({
           {children}
         </main>
         <BottomNav />
+        <Analytics />
       </body>
     </html>
   );
