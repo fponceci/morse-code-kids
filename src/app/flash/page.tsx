@@ -63,8 +63,8 @@ export default function FlashPage() {
 
   return (
     <>
-      {/* Screen flash effect for visual feedback */}
-      <ScreenFlash active={isFlashing} />
+      {/* Screen flash effect — only on devices with no real torch (desktop preview) */}
+      <ScreenFlash active={isFlashing && !isAvailable} />
 
       <div className="flex flex-col min-h-screen bg-morse-navy">
         <Navbar title="🔦 Flashlight Signal" showBack darkMode />
