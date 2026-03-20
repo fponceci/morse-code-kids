@@ -7,8 +7,9 @@ import { clsx } from 'clsx';
 const navItems = [
   { href: '/', label: 'Home', emoji: '🏠' },
   { href: '/translator', label: 'Translate', emoji: '🔤' },
-  { href: '/listen', label: 'Listen', emoji: '👂' },
+  { href: '/listen', label: 'Learn', emoji: '📖' },
   { href: '/games', label: 'Games', emoji: '🎮' },
+  { href: '/flash', label: 'Flash', emoji: '🔦' },
 ];
 
 export function BottomNav() {

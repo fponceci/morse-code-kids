@@ -136,6 +136,13 @@ export class MorseAudioEngine {
     return this.play([char], speed);
   }
 
+  /** Play a single beep of a given duration — used by the flashlight hook for sync */
+  async beepMs(durationMs: number): Promise<void> {
+    await this.resume();
+    const ctx = this.getCtx();
+    await this.beep(ctx, durationMs);
+  }
+
   stop() {
     this.abortController?.abort();
     this.abortController = null;
